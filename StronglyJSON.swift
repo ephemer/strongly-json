@@ -16,238 +16,21 @@ public enum JSON {
     case JSONNull
 }
 
-// MARK:- StringLiteralConvertible conformance
-
-extension JSON : StringLiteralConvertible {
-    public init(stringLiteral value: String) {
-        let string = value.trimmed()
-        
-        if let int = Int(string) {
-            self = .JSONInt(int)
-        } else if let dbl = Double(string) {
-            self = .JSONDouble(dbl)
-        } else if let bool = JSON.boolFromString(string) {
-            self = bool
-        } else if string == "null" {
-            self = .JSONNull
-        } else if let array = JSON.arrayFromString(string) {
-            self = array
-        } else if let dict = try? JSON.dictFromString(string) {
-            self = dict
-        } else {
-            self = .JSONString(string)
-        }
-    }
-    
-    public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterType) {
-        self = JSON(stringLiteral: String(value))
-    }
-    
-    public init(unicodeScalarLiteral value: UnicodeScalarType) {
-        self = JSON(stringLiteral: String(value))
-    }
-}
-
-
-// MARK: fromString helpers
-
-private extension String {
-    func trimmed() -> String {
-        var chars = self.characters
-        let whitespaceCharset: Set<Character> = [" ", "\u{000A}", "\u{000B}", "\u{000C}", "\u{000D}", "\u{0085}"]
-        
-        while chars.count > 0 {
-            if whitespaceCharset.contains(chars.first!) {
-                chars = chars.dropFirst()
-            } else if whitespaceCharset.contains(chars.last!) {
-                chars = chars.dropLast()
-            } else {
-                break
-            }
-        }
-        
-        return String(chars)
-    }
-}
-
-extension JSON {
-    
-    static private func boolFromString(string: String) -> JSON? {
-        switch string.lowercaseString {
-        case "true": return true
-        case "false": return false
-        default: return nil
-        }
-    }
-    
-    private enum DictGenerationError : ErrorType {
-        case NotSurroundedInCurlyBraces
-        case ContentsIncorrect
-    }
-    
-    static private func dictFromString(string: String) throws -> JSON {
-        var chars = string.characters // copy on write
-        if chars.first == "{" && chars.last == "}" {
-            chars = chars.dropFirst().dropLast()
-            
-            var dict = [String : JSON]()
-            let dictPairs = chars.splitIntoChunks()
-            
-            dictPairs.forEach {
-                let dictComponents = $0.characters.split(":")
-                if dictComponents.count != 2 { return }
-                
-                let key = String(dictComponents[0]).trimmed()
-                dict[key] = JSON(stringLiteral: String(dictComponents[1]))
-            }
-            
-            if dict.count == dictPairs.count {
-                return JSON.JSONObject(dict)
-            } else {
-                throw DictGenerationError.ContentsIncorrect
-            }
-        }
-        
-        throw DictGenerationError.NotSurroundedInCurlyBraces
-    }
-    
-    static private func arrayFromString(string: String) -> JSON? {
-        var chars = string.characters // copy on write
-        if chars.first == "[" && chars.last == "]" {
-            chars = chars.dropFirst().dropLast()
-            let jsonArray = chars.splitIntoChunks().map { JSON(stringLiteral: $0) }
-            return .JSONArray(jsonArray)
-        }
-        
-        return nil
-    }
-}
-
-extension String.CharacterView {
-    func splitIntoChunks(separator: Character = ",") -> [String] {
-        var currentChunk = ""
-        var chunks: [String] = []
-        var brackets = [Character]()
-        
-        self.enumerate().forEach { (i, character) in
-            switch character {
-            case "[": brackets.append(character)
-            case "{": brackets.append(character)
-            case "]": if let i = brackets.indexOf("[") { brackets.removeAtIndex(i) }
-            case "}": if let i = brackets.indexOf("{") { brackets.removeAtIndex(i) }
-            case ",":
-                if brackets.count == 0 {
-                    chunks.append(currentChunk)
-                    currentChunk = ""
-                    return
-                }
-            default: break
-            }
-            
-            currentChunk.append(character)
-        }
-        
-        if currentChunk != "" { chunks.append(currentChunk) }
-        
-        // XXX: Fix this terrible error handling:
-        if brackets.count != 0 { print("There was an unmatched count of brackets"); return [] }
-        
-        return chunks
-    }
-}
-
-
-// MARK:- Conform to other literal convertibles
-
-extension JSON : BooleanLiteralConvertible, IntegerLiteralConvertible, FloatLiteralConvertible {
-    public init(booleanLiteral value: Bool) { self = .JSONBool(value)   }
-    public init(integerLiteral value: Int)  { self = .JSONInt(value)    }
-    public init(floatLiteral value: Double) { self = .JSONDouble(value) }
-}
-
-extension JSON : ArrayLiteralConvertible, DictionaryLiteralConvertible {
-    public init(arrayLiteral elements: JSON...) {
-        self = JSON.JSONArray(elements)
-    }
-    
-    public init(dictionaryLiteral elements: (String, JSON)...) {
-        var dict = [String: JSON]()
-        elements.forEach { dict[$0.0] = $0.1 }
-        self = JSON.JSONObject(dict)
-    }
-}
-
-extension JSON : NilLiteralConvertible {
-    public init(nilLiteral: ()) {
-        self = .JSONNull
-    }
-}
-
-
-// MARK:- Equatable conformance
-
-extension JSON : Equatable {}
-
-public func ==(lhs: JSON, rhs: JSON) -> Bool {
-    switch (lhs, rhs) {
-    case let (.JSONInt(a), .JSONInt(b)): return a == b
-    case let (.JSONString(a), .JSONString(b)): return a == b
-    case let (.JSONDouble(a), .JSONDouble(b)): return a == b
-    case let (.JSONBool(a), .JSONBool(b)): return a == b
-    case let (.JSONArray(a), .JSONArray(b)): return a == b
-    case let (.JSONObject(a), .JSONObject(b)): return a == b
-    case (.JSONNull, .JSONNull): return true
-    default: return false
-    }
-}
-
-
-// MARK:- Convert to string (including verbose debugging version)
-
-extension JSON : CustomStringConvertible, CustomDebugStringConvertible {
-    public var description: String {
-        switch self {
-        case let .JSONString(o): return o
-        case let .JSONInt(o): return "\(o)"
-        case let .JSONDouble(o): return "\(o)"
-        case let .JSONBool(o): return "\(o)"
-        case let .JSONArray(o): return "\(o)"
-        case let .JSONObject(o): return "\(o)"
-        case .JSONNull: return "null"
-        }
-    }
-    
-    public var debugDescription: String {
-        switch self {
-        case let .JSONString(o): return o.debugDescription
-        case let .JSONInt(o): return "JSONInt(\(o))"
-        case let .JSONDouble(o): return "JSONDouble(\(o))"
-        case let .JSONBool(o): return "JSONBool(\(o))"
-        case let .JSONArray(o): return "JSONArray(\(o))"
-        case let .JSONObject(o): return "JSONObject(\(o))"
-        case .JSONNull: return "JSONNull"
-        }
-    }
-}
-
-
-// Make easy-to-use accessor API
+// MARK: Easy to use accessors
 
 extension JSON {
     subscript(i: Int) -> JSON? {
         switch self {
-            case .JSONArray(let array): if i < array.count { return array[i] }
-            default: break
+        case .JSONArray(let array) where i < array.count: return array[i]
+        default: return nil
         }
-        return nil
     }
     
     subscript(key: String) -> JSON? {
         switch self {
-            case .JSONObject(let obj): return obj[key]
-            default: break
+        case .JSONObject(let obj): return obj[key]
+        default: return nil
         }
-        return nil
     }
     
     public var asString: String {
@@ -258,7 +41,7 @@ extension JSON {
     // XXX: I have not tested this much yet, as the focus has been serializing input
     public var asJSONString: String {
         switch self {
-        case .JSONString(let string): return "\"\(string)\""
+        case .JSONString(let string): return string.debugDescription
         default: return self.description
         }
     }
@@ -301,4 +84,101 @@ extension JSON {
         return self == .JSONNull
     }
     
+}
+
+
+// MARK: Convert to string (including verbose debugging version)
+
+extension JSON : CustomStringConvertible, CustomDebugStringConvertible {
+    public var description: String {
+        switch self {
+        case let .JSONString(o): return o
+        case let .JSONInt(o): return "\(o)"
+        case let .JSONDouble(o): return "\(o)"
+        case let .JSONBool(o): return "\(o)"
+        case let .JSONArray(o): return "\(o)"
+        case let .JSONObject(o): return "\(o)"
+        case .JSONNull: return "null"
+        }
+    }
+    
+    public var debugDescription: String {
+        switch self {
+        case let .JSONString(o): return o.debugDescription
+        case let .JSONInt(o): return "JSONInt(\(o))"
+        case let .JSONDouble(o): return "JSONDouble(\(o))"
+        case let .JSONBool(o): return "JSONBool(\(o))"
+        case let .JSONArray(o): return "JSONArray: \(o)"
+        case let .JSONObject(o): return "JSONObject: \(o)"
+        case .JSONNull: return "JSONNull"
+        }
+    }
+}
+
+
+// MARK:- Convert strings and other literals into JSON
+
+extension JSON : StringLiteralConvertible {
+    public init(stringLiteral string: String) {
+        self = JSONParser(jsonString: string).parse()
+    }
+    
+    public init(extendedGraphemeClusterLiteral value: String) {
+        self = JSON(stringLiteral: value)
+    }
+    
+    public init(unicodeScalarLiteral value: String) {
+        self = JSON(stringLiteral: value)
+    }
+}
+
+extension JSON : BooleanLiteralConvertible, IntegerLiteralConvertible, FloatLiteralConvertible, NilLiteralConvertible, ArrayLiteralConvertible, DictionaryLiteralConvertible {
+    public init(nilLiteral: ()) {
+        self = .JSONNull
+    }
+    
+    public init(booleanLiteral value: Bool) {
+        self = .JSONBool(value)
+    }
+    
+    public init(integerLiteral value: Int) {
+        self = .JSONInt(value)
+    }
+    
+    public init(floatLiteral value: Double) {
+        self = .JSONDouble(value)
+    }
+    
+    public init(arrayLiteral elements: JSON...) {
+        self = .JSONArray(elements)
+    }
+    
+    public init(dictionaryLiteral pairs: (String, JSON)...) {
+        self = .JSONObject([String: JSON](keyValuePairs: pairs))
+    }
+}
+
+private extension Dictionary {
+    init(keyValuePairs: [(Key, Value)]) {
+        self.init()
+        keyValuePairs.forEach { self[$0.0] = $0.1 }
+    }
+}
+
+
+// MARK:- Equatable conformance
+
+extension JSON : Equatable {}
+
+public func ==(lhs: JSON, rhs: JSON) -> Bool {
+    switch (lhs, rhs) {
+    case let (.JSONInt(a), .JSONInt(b)): return a == b
+    case let (.JSONString(a), .JSONString(b)): return a == b
+    case let (.JSONDouble(a), .JSONDouble(b)): return a == b
+    case let (.JSONBool(a), .JSONBool(b)): return a == b
+    case let (.JSONArray(a), .JSONArray(b)): return a == b
+    case let (.JSONObject(a), .JSONObject(b)): return a == b
+    case (.JSONNull, .JSONNull): return true
+    default: return false
+    }
 }

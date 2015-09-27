@@ -12,6 +12,8 @@
 		0A43D5D91BA609BC00D2B742 /* StringLiteralTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A43D5D81BA609BC00D2B742 /* StringLiteralTests.swift */; settings = {ASSET_TAGS = (); }; };
 		0A43D5DB1BA609CA00D2B742 /* StronglyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A43D5DA1BA609CA00D2B742 /* StronglyJSON.swift */; settings = {ASSET_TAGS = (); }; };
 		0A473E641BA6126200383AF3 /* RetrievalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A473E631BA6126200383AF3 /* RetrievalTests.swift */; settings = {ASSET_TAGS = (); }; };
+		0A4BC2F91BB849B200F38CB0 /* ComprehensiveJSONReadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BC2F71BB8487E00F38CB0 /* ComprehensiveJSONReadTests.swift */; settings = {ASSET_TAGS = (); }; };
+		0AFE8C211BAA2A18008633A4 /* StronglyJSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AFE8C201BAA2A18008633A4 /* StronglyJSONParser.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +35,8 @@
 		0A43D5D81BA609BC00D2B742 /* StringLiteralTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringLiteralTests.swift; sourceTree = "<group>"; };
 		0A43D5DA1BA609CA00D2B742 /* StronglyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = StronglyJSON.swift; path = ../StronglyJSON/StronglyJSON.swift; sourceTree = "<group>"; };
 		0A473E631BA6126200383AF3 /* RetrievalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RetrievalTests.swift; path = ../../StronglyJSON/StronglyJSONTests/RetrievalTests.swift; sourceTree = "<group>"; };
+		0A4BC2F71BB8487E00F38CB0 /* ComprehensiveJSONReadTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ComprehensiveJSONReadTests.swift; path = StronglyJSONTests/ComprehensiveJSONReadTests.swift; sourceTree = SOURCE_ROOT; };
+		0AFE8C201BAA2A18008633A4 /* StronglyJSONParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StronglyJSONParser.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +61,7 @@
 		0A43D5AB1BA609AB00D2B742 = {
 			isa = PBXGroup;
 			children = (
+				0AFE8C201BAA2A18008633A4 /* StronglyJSONParser.swift */,
 				0A43D5DA1BA609CA00D2B742 /* StronglyJSON.swift */,
 				0A43D5B71BA609AB00D2B742 /* StronglyJSON */,
 				0A43D5C31BA609AB00D2B742 /* StronglyJSONTests */,
@@ -89,6 +94,7 @@
 				0A43D5C61BA609AB00D2B742 /* Info.plist */,
 				0A473E631BA6126200383AF3 /* RetrievalTests.swift */,
 				0A43D5D81BA609BC00D2B742 /* StringLiteralTests.swift */,
+				0A4BC2F71BB8487E00F38CB0 /* ComprehensiveJSONReadTests.swift */,
 			);
 			name = StronglyJSONTests;
 			path = stronglyJSONTests;
@@ -201,6 +207,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AFE8C211BAA2A18008633A4 /* StronglyJSONParser.swift in Sources */,
 				0A43D5DB1BA609CA00D2B742 /* StronglyJSON.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -209,6 +216,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A4BC2F91BB849B200F38CB0 /* ComprehensiveJSONReadTests.swift in Sources */,
 				0A473E641BA6126200383AF3 /* RetrievalTests.swift in Sources */,
 				0A43D5D91BA609BC00D2B742 /* StringLiteralTests.swift in Sources */,
 			);

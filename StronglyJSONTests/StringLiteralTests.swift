@@ -15,22 +15,22 @@ class StringLiteralTests: XCTestCase {
     // MARK: Simple data structures
     
     func testMakeJSONInt() {
-        let json: JSON = "123"
+        let json: JSON = 123
         XCTAssert(json == .JSONInt(123))
     }
     
     func testMakeJSONDouble() {
-        let json: JSON = "123.321"
+        let json: JSON = 123.321
         XCTAssert(json == .JSONDouble(123.321))
     }
     
     func testMakeJSONBool() {
-        let json: JSON = "true"
+        let json: JSON = true
         XCTAssert(json == .JSONBool(true))
     }
     
     func testMakeJSONNull() {
-        let json: JSON = "null"
+        let json: JSON = nil
         XCTAssert(json == .JSONNull)
     }
     
@@ -40,34 +40,65 @@ class StringLiteralTests: XCTestCase {
     }
     
     func testMakeJSONArray() {
-        let json: JSON = "[true, 123, 123.456]"
-        XCTAssert(json == .JSONArray([true, 123, 123.456]))
+        let string = "[true, 123, 123.456]"
+        let parser = JSONParser(jsonString: string)
+        let json = parser.parse()
+        
+        XCTAssert(json == .JSONArray([true, 123, 123.456]), json.debugDescription)
     }
     
     func testMakeJSONObject() {
-        let json: JSON = "{anInteger:123, aFloatValue: 123.456}"
-        XCTAssert(json == .JSONObject([
+        let string = "{'anInteger':123, 'aFloatValue': 123.456}"
+        let parser = JSONParser(jsonString: string)
+        let json = parser.parse()
+        
+        let literal: JSON = .JSONObject([
             "anInteger" : 123,
             "aFloatValue" : 123.456
-            ]))
+        ])
+
+        XCTAssert(json == literal, json.debugDescription)
     }
 
     
     // MARK: More complex data structures
     
     func testMakeComplexJSONArray() {
-        let json: JSON = "[[1,2,3],true,  0.123, {test: true, int: 1}  ] "
+        let string = "{\"widget\":{\"debug\":\"on\",\"window\":{\"title\":\"Sample Konfabulator Widget\",\"name\":\"main's_window\",\"width\":500,\"height\":500},\"image\":{\"src\":\"Images/Sun.png\",\"name\":\"sun1\",\"hOffset\":250,\"vOffset\":250,\"alignment\":\"center\"},\"text\":{\"data\":\"Click Here\",\"size\":36,\"style\":\"bold\",\"name\":\"text1\",\"hOffset\":250,\"vOffset\":100,\"alignment\":\"center\",\"onMouseUp\":\"sun1.opacity = (sun1.opacity / 100) * 90;\"}}}"
+        
+        let parser = JSONParser(jsonString: string)
+        let json = parser.parse()
+        
         let staticJson: JSON = [
-            [1,2,3],
-            true,
-            0.123,
-            [
-                "test": true,
-                "int": 1
+            "widget": [
+                "debug":"on",
+                "window": [
+                    "title":"Sample Konfabulator Widget",
+                    "name":"main's_window",
+                    "width":500,
+                    "height":500
+                ],
+                "image": [
+                    "src":"Images/Sun.png",
+                    "name":"sun1",
+                    "hOffset":250,
+                    "vOffset":250,
+                    "alignment":"center"
+                ],
+                "text": [
+                    "data":"Click Here",
+                    "size":36,
+                    "style":"bold",
+                    "name":"text1",
+                    "hOffset":250,
+                    "vOffset":100,
+                    "alignment":"center",
+                    "onMouseUp":"sun1.opacity = (sun1.opacity / 100) * 90;"
+                ]
             ]
         ]
-
-        XCTAssert(json == staticJson)
+        
+        XCTAssert(json == staticJson, json.debugDescription)
     }
     
 }
