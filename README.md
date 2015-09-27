@@ -28,9 +28,9 @@ print(jsonFromDict["someNullValue"]) // prints "null"
 
 - Easy to use: make and read from JSON arrays, primitives and dictionaries with natural Swift syntax
 - No weird operator overloads
-- It's fast! (As far as I can see. I haven't tested against other Swift libraries, but in my early tests it was up to 4x faster than NSJSONSerialization, depending on the data structures). _And if it's not, let's improve it together!_
-- There is a basic test suite included, that will be added to as development continues
+- There is a basic test suite included that will be added to as development continues
 - Doesn't use NSJSONSerialization or any other other non-standard-library APIs. It'll work cross-platform when Swift gets open-sourced.
+- Relative speed is difficult to measure at this point: the current code produces a fully structured, statically typed dataset from the get-go. NSJSONSerialization and other solutions need further checks and logic to piece apart what's inside. I'm working on measuring this in a meaningful way.
 - MIT Licence
 
 
