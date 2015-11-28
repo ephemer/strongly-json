@@ -16,27 +16,27 @@ class StringLiteralTests: XCTestCase {
     
     func testMakeJSONInt() {
         let json: JSON = 123
-        XCTAssert(json == .JSONInt(123))
+        XCTAssert(json == .JSONValue("123"))
     }
     
     func testMakeJSONDouble() {
         let json: JSON = 123.321
-        XCTAssert(json == .JSONDouble(123.321))
+        XCTAssert(json == .JSONValue("123.321"))
     }
     
     func testMakeJSONBool() {
         let json: JSON = true
-        XCTAssert(json == .JSONBool(true))
+        XCTAssert(json == .JSONValue("true"))
     }
     
     func testMakeJSONNull() {
         let json: JSON = nil
-        XCTAssert(json == .JSONNull)
+        XCTAssert(json == .JSONValue("null"))
     }
     
     func testMakeJSONString() {
         let json: JSON = "here's a string, make of it what you will"
-        XCTAssert(json == .JSONString("here's a string, make of it what you will"))
+        XCTAssert(json == .JSONValue("here's a string, make of it what you will"))
     }
     
     func testMakeJSONArray() {

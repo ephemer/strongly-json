@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "16B80E7E93DE86D767B659980DCBD3793D5C7C65",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "16B80E7E93DE86D767B659980DCBD3793D5C7C65" : 0,
+    "3D8B2F405978A0544554AD137A0155DFCDEB7012" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "4869176A-0124-421E-BFC6-5F23B4078AD7",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "16B80E7E93DE86D767B659980DCBD3793D5C7C65" : "strongly-json\/",
+    "3D8B2F405978A0544554AD137A0155DFCDEB7012" : "jsmn\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "StronglyJSON",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "StronglyJSON.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/ephemer\/strongly-json.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "16B80E7E93DE86D767B659980DCBD3793D5C7C65"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/zserge\/jsmn.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3D8B2F405978A0544554AD137A0155DFCDEB7012"
+    }
+  ]
+}

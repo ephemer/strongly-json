@@ -13,13 +13,13 @@ class RetrievalTests: XCTestCase {
     
     // MARK: Simple tests
     
-    let simpleJSONArray: JSON = [.JSONInt(123), .JSONBool(true), .JSONString("a string ")]
-    let simpleJSONDict: JSON = ["test1": .JSONBool(false), "test2": .JSONDouble(999.999), "test3": .JSONNull]
+    let simpleJSONArray: JSON = [.JSONValue("123"), .JSONValue("true"), .JSONValue("a string ")]
+    let simpleJSONDict: JSON = ["test1": .JSONValue("false"), "test2": .JSONValue("999.999"), "test3": .JSONValue("null")]
     
     func testSimpleArrayRetrieval() {
-        XCTAssert(simpleJSONArray[0] == .JSONInt(123))
-        XCTAssert(simpleJSONArray[1] == .JSONBool(true))
-        XCTAssert(simpleJSONArray[2] == .JSONString("a string "))
+        XCTAssert(simpleJSONArray[0] == .JSONValue("123"))
+        XCTAssert(simpleJSONArray[1] == .JSONValue("true"))
+        XCTAssert(simpleJSONArray[2] == .JSONValue("a string "))
     }
     
     func testSimpleArrayRetrievalWithExplicitTypes() {
@@ -43,9 +43,9 @@ class RetrievalTests: XCTestCase {
     
     func testComplexArrayRetrieval() {
         XCTAssert(complexJSONArray[0] == -1)
-        XCTAssert(complexJSONArray[1] == .JSONNull)
+        XCTAssert(complexJSONArray[1] == .JSONValue("null"))
         XCTAssert(complexJSONArray[2]?["array"] == [1])
-        XCTAssert(complexJSONArray[3]?[1] == .JSONBool(false))
+        XCTAssert(complexJSONArray[3]?[1] == .JSONValue("false"))
     }
     
     func testComplexArrayRetrievalWithExplicitTypes() {

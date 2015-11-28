@@ -9,11 +9,7 @@
 public enum JSON {
     case JSONArray([JSON])
     case JSONObject([String : JSON])
-    case JSONString(String)
-    case JSONInt(Int)
-    case JSONDouble(Double)
-    case JSONBool(Bool)
-    case JSONNull
+    case JSONValue(String)
 }
 
 // MARK: Easy to use accessors
@@ -40,36 +36,29 @@ extension JSON {
     // This ensures the syntax gets correctly exported as serialised JSON
     // XXX: I have not tested this much yet, as the focus has been serializing input
     public var asJSONString: String {
-        switch self {
-        case .JSONString(let string): return string.debugDescription
-        default: return self.description
-        }
+        return self.description
     }
     
     public var asInt: Int? {
         switch self {
-        case .JSONInt(let int): return int
+        case .JSONValue(let str): return Int(str)
         default: return nil
         }
     }
     
     public var asDouble: Double? {
         switch self {
-        case .JSONInt(let int): return Double(int)
-        case .JSONDouble(let double): return double
+        case .JSONValue(let str): return Double(str)
         default: return nil
         }
     }
     
     public var asBool: Bool {
         switch self {
-        case .JSONBool(let bool): return bool
-        case .JSONInt(let int): return int != 0
-        case .JSONDouble(let double): return double != 0
-        case .JSONString(let string): return string.characters.count > 0
+        case .JSONValue(let str):
+            return !str.isEmpty && Double(str) != 0 && str != "false" && str != "null"
         case .JSONObject: return true
         case .JSONArray: return true
-        case .JSONNull: return false
         }
     }
     
@@ -81,7 +70,11 @@ extension JSON {
     }
     
     public var isNull: Bool {
-        return self == .JSONNull
+        if case .JSONValue(let val) = self where val == "null" {
+            return true
+        } else {
+            return false
+        }
     }
     
 }
@@ -92,25 +85,17 @@ extension JSON {
 extension JSON : CustomStringConvertible, CustomDebugStringConvertible {
     public var description: String {
         switch self {
-        case let .JSONString(o): return o
-        case let .JSONInt(o): return "\(o)"
-        case let .JSONDouble(o): return "\(o)"
-        case let .JSONBool(o): return "\(o)"
+        case let .JSONValue(o): return o
         case let .JSONArray(o): return "\(o)"
         case let .JSONObject(o): return "\(o)"
-        case .JSONNull: return "null"
         }
     }
     
     public var debugDescription: String {
         switch self {
-        case let .JSONString(o): return o.debugDescription
-        case let .JSONInt(o): return "JSONInt(\(o))"
-        case let .JSONDouble(o): return "JSONDouble(\(o))"
-        case let .JSONBool(o): return "JSONBool(\(o))"
+        case let .JSONValue(o): return "JSONValue: \(o)"
         case let .JSONArray(o): return "JSONArray: \(o)"
         case let .JSONObject(o): return "JSONObject: \(o)"
-        case .JSONNull: return "JSONNull"
         }
     }
 }
@@ -134,19 +119,19 @@ extension JSON : StringLiteralConvertible {
 
 extension JSON : BooleanLiteralConvertible, IntegerLiteralConvertible, FloatLiteralConvertible, NilLiteralConvertible, ArrayLiteralConvertible, DictionaryLiteralConvertible {
     public init(nilLiteral: ()) {
-        self = .JSONNull
+        self = .JSONValue("null")
     }
     
     public init(booleanLiteral value: Bool) {
-        self = .JSONBool(value)
+        self = .JSONValue("\(value)")
     }
     
     public init(integerLiteral value: Int) {
-        self = .JSONInt(value)
+        self = .JSONValue("\(value)")
     }
     
     public init(floatLiteral value: Double) {
-        self = .JSONDouble(value)
+        self = .JSONValue("\(value)")
     }
     
     public init(arrayLiteral elements: JSON...) {
@@ -172,13 +157,9 @@ extension JSON : Equatable {}
 
 public func ==(lhs: JSON, rhs: JSON) -> Bool {
     switch (lhs, rhs) {
-    case let (.JSONInt(a), .JSONInt(b)): return a == b
-    case let (.JSONString(a), .JSONString(b)): return a == b
-    case let (.JSONDouble(a), .JSONDouble(b)): return a == b
-    case let (.JSONBool(a), .JSONBool(b)): return a == b
+    case let (.JSONValue(a), .JSONValue(b)): return a == b
     case let (.JSONArray(a), .JSONArray(b)): return a == b
     case let (.JSONObject(a), .JSONObject(b)): return a == b
-    case (.JSONNull, .JSONNull): return true
     default: return false
     }
 }

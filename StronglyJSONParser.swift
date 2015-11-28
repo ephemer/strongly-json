@@ -6,7 +6,7 @@
 //  Copyright © 2015 Geordie Jay. All rights reserved.
 //
 
-typealias Char = Character
+typealias Char = UnicodeScalar
 private let SingleQuote: Char        = "'"
 private let DoubleQuote: Char        = "\""
 private let OpenSquareBracket: Char  = "["
@@ -18,19 +18,19 @@ private let ValueDelimiter: Char     = ":"
 
 
 class JSONParser {
-    let jsonString: String.CharacterView
-    var lowerBound: String.Index
-    var curIndex: String.Index
+    let jsonString: String.UnicodeScalarView
+    var lowerBound: String.UnicodeScalarIndex
+    var curIndex: String.UnicodeScalarIndex
     
     init(jsonString: String) {
-        self.jsonString = jsonString.characters
-        lowerBound = jsonString.startIndex
+        self.jsonString = jsonString.unicodeScalars
+        lowerBound = self.jsonString.indices.first!
         curIndex = lowerBound
     }
     
     private enum JSONNodeType {
         case rootNode, singleQuote, doubleQuote, array, object
-        init?(startingCharacter character: Character) {
+        init?(startingCharacter character: Char) {
             switch character {
             case SingleQuote: self = .singleQuote
             case DoubleQuote: self = .doubleQuote
@@ -51,7 +51,7 @@ class JSONParser {
     
     func parse() -> JSON {
         if jsonString.isAPlainString {
-            return .JSONString(String(jsonString))
+            return .JSONValue(String(jsonString))
         }
         return parseAs(.rootNode)
     }
@@ -71,11 +71,7 @@ class JSONParser {
             let chars = jsonString[lowerBound ..< curIndex].trimmed()
             if chars.count > 0 {
                 let str = String(chars)
-                if node.isQuotedString { // don't parse quoted strings
-                    addToken(.JSONString(str))
-                } else { // parse another value / container type
-                    addToken(JSON(chars: chars))
-                }
+                addToken(.JSONValue(str))
             } else {
                 advanceLowerBound()
             }
@@ -96,7 +92,7 @@ class JSONParser {
             DoubleQuote where node == .doubleQuote:
                 addTokenSinceLowerBound()
                 let str = tokens.map{$0.asString}.reduce("", combine: +)
-                return .JSONString(str)
+                return .JSONValue(str)
                 
             case CloseSquareBracket where node == .array:
                 addTokenSinceLowerBound()
@@ -139,27 +135,6 @@ class JSONParser {
 }
 
 
-private extension JSON {
-    init(chars: String.CharacterView) {
-        let string = String(chars)
-        if let int = Int(string) {
-            self = .JSONInt(int)
-        } else if let dbl = Double(string) {
-            self = .JSONDouble(dbl)
-        } else if let bool = Bool(string) {
-            self = .JSONBool(bool)
-        } else if string == "null" {
-            self = .JSONNull
-        } else {
-            // Tried to parse something that should have been quoted
-            // This should throw an exception
-            print("This should not be returned as a string:", string)
-            self = .JSONString(string)
-        }
-    }
-}
-
-
 // MARK: Standard library helpers
 
 extension Array where Element : CustomStringConvertible {
@@ -184,16 +159,16 @@ private extension Bool {
 }
 
 
-let whitespaceCharset: Set<Character> = [
+let whitespaceCharset: Set<UnicodeScalar> = [
     " ", "\n", "\u{000A}", "\u{000B}", "\u{000C}", "\u{000D}", "\u{0085}"
 ]
 
-private extension String.CharacterView {
+private extension String.UnicodeScalarView {
     var isAPlainString: Bool {return !self.isAnArray && !self.isAnObject}
     var isAnArray: Bool { return self.first == "[" && self.last == "]" }
     var isAnObject: Bool { return self.first == "{" && self.last == "}" }
     
-    func trimmed() -> String.CharacterView {
+    func trimmed() -> String.UnicodeScalarView {
         var chars = self
         while chars.count > 0 {
             if whitespaceCharset.contains(chars.first!) {
