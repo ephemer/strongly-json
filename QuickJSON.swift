@@ -6,13 +6,13 @@
 //  Copyright © 2015 Geordie Jay. All rights reserved.
 //
 
-//: Playground - noun: a place where people can play
+typealias Index = String.UnicodeScalarIndex
 
-public typealias Index = String.UnicodeScalarIndex
-
-public protocol JSON: CustomStringConvertible {
-    var description: String {get}
+protocol JSONSerializer {
     static func fromString(str: String.UnicodeScalarView, startIndex: Index) throws -> (JSON, Index)
+}
+
+protocol JSON: CustomStringConvertible {
     //    var asDouble: Double? {get}
     //    var asString: String? {get}
     //    var asInteger: Int? {get}
@@ -31,10 +31,11 @@ struct JSONError: ErrorType, CustomStringConvertible {
         case InvalidCharacter
         case PartialInputProvided
         case RootLevelMustBeAContainer
+        case InvalidNumberPrimitive
     }
 }
 
-public struct ContainerToken: JSON {
+public struct JSONContainer: JSON, JSONSerializer {
     private enum ContainerType {
         case Array, Object
     }
@@ -56,16 +57,34 @@ public struct ContainerToken: JSON {
         }
     }
 
-    public static func fromString(str: String.UnicodeScalarView, startIndex: Index) throws -> (JSON, Index) {
+    static func fromString(str: String.UnicodeScalarView, startIndex: Index) throws -> (JSON, Index) {
         var tokens: [JSON] = []
+        tokens.reserveCapacity(300) // XXX: a magic number, obviously. maybe worth estimating in an initial pass, even if we overestimate at e.g. 1/4 of str.count
+
         var curIndex = startIndex
         let containerType: ContainerType = (str[curIndex] == "{") ? .Object : .Array
 
         while ++curIndex < str.endIndex {
             switch str[curIndex] {
-            case "-", "0"..."9", "t"/*rue*/, "f"/*alse*/, "n"/*ull*/:
+            case "-", "0"..."9":
                 do {
-                    let (subtoken, endIndex) = try PrimitiveToken.fromString(str, startIndex: curIndex)
+                    let (subtoken, endIndex) = try JSONNumber.fromString(str, startIndex: curIndex)
+                    tokens.append(subtoken)
+                    curIndex = endIndex
+                    continue
+                } catch { throw error }
+
+            case "t"/*rue*/, "f"/*alse*/:
+                do {
+                    let (subtoken, endIndex) = try Bool.fromString(str, startIndex: curIndex)
+                    tokens.append(subtoken)
+                    curIndex = endIndex
+                    continue
+                } catch { throw error }
+
+            case "n"/*ull*/:
+                do {
+                    let (subtoken, endIndex) = try JSONNull.fromString(str, startIndex: curIndex)
                     tokens.append(subtoken)
                     curIndex = endIndex
                     continue
@@ -81,18 +100,18 @@ public struct ContainerToken: JSON {
 
             case "[", "{":
                 do {
-                    let (subtoken, endIndex) = try ContainerToken.fromString(str, startIndex: curIndex)
+                    let (subtoken, endIndex) = try JSONContainer.fromString(str, startIndex: curIndex)
                     tokens.append(subtoken)
                     curIndex = endIndex
                     continue
                 } catch { throw error }
 
             case "]" where containerType == .Array:
-                return (ContainerToken(type: containerType, tokens: tokens), curIndex)
+                return (JSONContainer(type: .Array, tokens: tokens), curIndex)
 
             case "}" where containerType == .Object:
                 if tokens.count % 2 == 0 {
-                    return (ContainerToken(type: containerType, tokens: tokens), curIndex)
+                    return (JSONContainer(type: .Object, tokens: tokens), curIndex)
                 }
                 // else break the loop, below, which leads to a PartialInputProvided error
 
@@ -116,7 +135,14 @@ public struct ContainerToken: JSON {
     }
 }
 
-struct StringToken: JSON {
+
+extension String: JSON {
+    public var description: String {
+        return self
+    }
+}
+
+struct StringToken: JSONSerializer {
     let string: String.UnicodeScalarView
     var description: String { return String(string) }
 
@@ -127,7 +153,7 @@ struct StringToken: JSON {
         while ++curIndex < str.endIndex {
             switch str[curIndex] {
             case initialQuoteMark:
-                return (StringToken(string: str[startIndex.successor() ..< curIndex]), curIndex)
+                return (String(str[startIndex.successor() ..< curIndex]), curIndex)
             default:
                 continue
             }
@@ -138,32 +164,20 @@ struct StringToken: JSON {
     }
 }
 
-struct PrimitiveToken: JSON {
-    private enum PrimitiveType {
-        case Boolean, Null, Integer, Double
-    }
-
-    let intValue: Int
-    let doubleValue: Double
-    let isNull: Bool
-    let boolValue: Bool
-
-    var description: String {
-        // XXX: fix me
-        return doubleValue.description
+extension Bool : JSON, JSONSerializer {
+    public var description: String {
+        return "\(self)"
     }
 
     static func fromString(str: String.UnicodeScalarView, startIndex: Index) throws -> (JSON, Index) {
         var curIndex = startIndex
-
-        // test for bool / null
         if
             str[startIndex] == "t" &&
             str[++curIndex] == "r" &&
             str[++curIndex] == "u" &&
             str[++curIndex] == "e"
         {
-            return (PrimitiveToken(intValue: 1, doubleValue: 1, isNull: false, boolValue: true), curIndex)
+            return (true, curIndex)
         } else if
             str[startIndex] == "f" &&
             str[++curIndex] == "a" &&
@@ -171,45 +185,86 @@ struct PrimitiveToken: JSON {
             str[++curIndex] == "s" &&
             str[++curIndex] == "e"
         {
-            return (PrimitiveToken(intValue: 0, doubleValue: 0, isNull: false, boolValue: false), curIndex)
-        } else if
+            return (false, curIndex)
+        }
+        else {
+            throw JSONError(reason: .InvalidCharacter, index: curIndex)
+        }
+    }
+}
+
+extension Int: JSON {}
+extension Double: JSON {}
+
+struct JSONNull : JSON, JSONSerializer {
+    var description: String {
+        return "null"
+    }
+
+    static func fromString(str: String.UnicodeScalarView, startIndex: Index) throws -> (JSON, Index) {
+        var curIndex = startIndex
+        if
             str[startIndex] == "n" &&
             str[++curIndex] == "u" &&
             str[++curIndex] == "l" &&
             str[++curIndex] == "l"
         {
-            return (PrimitiveToken(intValue: 0, doubleValue: 0, isNull: true, boolValue: false), curIndex)
+            return (JSONNull(), curIndex)
+        }
+        else {
+            throw JSONError(reason: .InvalidCharacter, index: curIndex)
+        }
+    }
+}
+
+struct JSONNumber: JSONSerializer {
+    static func fromString(str: String.UnicodeScalarView, startIndex: Index) throws -> (JSON, Index) {
+        var curIndex = startIndex
+        var foundDecimalPoint = false
+
+        if str[startIndex] == "-" {
+            // A minus sign is fine here.
+            // Throw an error if one is found in the loop below.
+            curIndex++
         }
 
-        // test for number
-
-        var numberContainsDecimalPoint = false
-
-        while ++curIndex < str.endIndex {
+        while curIndex < str.endIndex {
             switch str[curIndex] {
-            case "-":
-                if (curIndex != startIndex) {
-                    throw JSONError(reason: .InvalidCharacter, index: curIndex)
-                }
-
-            case ".":
-                if (numberContainsDecimalPoint) {
-                    throw JSONError(reason: .InvalidCharacter, index: curIndex)
-                } else {
-                    numberContainsDecimalPoint = true
-                }
-
             case "0"..."9":
-                continue
+                break
 
             case ",", "}", "]":
-//                let substr = String(str[startIndex ..< curIndex])
-                // XXX: boolValue here isn't strictly correct
-                return (PrimitiveToken(intValue: 0, doubleValue: 0, isNull: false, boolValue: true), curIndex.predecessor())
+                let numAsString = String(str[startIndex..<curIndex])
+                let lastNumericalIndex = curIndex.predecessor()
+
+                if foundDecimalPoint {
+                    if let doubleVal = Double(numAsString) {
+                        return (doubleVal, lastNumericalIndex)
+                    }
+                } else {
+                    if let intVal = Int(numAsString) {
+                        return (intVal, lastNumericalIndex)
+                    }
+                }
+
+                // In the unlikely event we get here, it's because we weren't able to convert
+                // the string to an Int or Double (presumably because of an overflow).
+                throw JSONError(reason: .InvalidNumberPrimitive, index: startIndex)
+
+            case ".":
+                if (foundDecimalPoint) {
+                    // More than one decimal point found in this Number
+                    throw JSONError(reason: .InvalidNumberPrimitive, index: curIndex)
+                } else {
+                    foundDecimalPoint = true
+                }
 
             default:
                 throw JSONError(reason: .InvalidCharacter, index: curIndex)
             }
+
+            curIndex++
+
         }
 
         // if non-strict, just return a NumberToken, else:

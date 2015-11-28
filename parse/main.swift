@@ -14,7 +14,7 @@ let stringData = originalString.dataUsingEncoding(NSUTF8StringEncoding)!
 
 
 for i in 0...50000 {
-    let container = try! ContainerToken.fromString(string, startIndex: string.startIndex)
+    let container = try! JSONContainer.fromString(string, startIndex: string.startIndex)
 }
 
 for i in 0...50000 {
@@ -22,4 +22,4 @@ for i in 0...50000 {
 }
 
 print(try! NSJSONSerialization.JSONObjectWithData(stringData, options: []))
-print(try! ContainerToken.fromString(string, startIndex: string.startIndex).0)
+print(try! JSONContainer.fromString(string, startIndex: string.startIndex).0)
