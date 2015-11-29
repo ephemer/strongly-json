@@ -118,7 +118,7 @@ public struct JSONContainer: JSON, JSONSerializer {
             case ":" where containerType == .Object && tokens.count % 2 == 1:
                 continue
 
-            case ",", " ", "\n", "\u{000A}", "\u{000B}", "\u{000C}", "\u{000D}", "\u{0085}":
+            case ",", " ", "\n", "\u{000B}", "\u{000C}", "\u{000D}", "\u{0085}":
                 continue
 
             default:
@@ -223,8 +223,8 @@ struct JSONNumber: JSONSerializer {
         var foundDecimalPoint = false
 
         if str[startIndex] == "-" {
-            // A minus sign is fine here.
-            // Throw an error if one is found in the loop below.
+            // A minus sign is fine here, but throw an
+            // error if one is found in the loop below.
             curIndex++
         }
 
