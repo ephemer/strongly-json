@@ -6,6 +6,12 @@
 //  Copyright © 2015 Geordie Jay. All rights reserved.
 //
 
+/*
+
+NOTE: This file is related to an earlier, less performant and less idiomatic version of the JSON Parser, it will be used for inspiration when creating the JSON->String implementation however
+
+*/
+
 public enum JSON {
     case JSONArray([JSON])
     case JSONObject([String : JSON])

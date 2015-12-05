@@ -9,9 +9,6 @@
 /* Begin PBXBuildFile section */
 		0A43D5B91BA609AB00D2B742 /* StronglyJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A43D5B81BA609AB00D2B742 /* StronglyJSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0A43D5C01BA609AB00D2B742 /* StronglyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A43D5B51BA609AB00D2B742 /* StronglyJSON.framework */; };
-		5C627EF31C018BDF004A12DA /* jsmn.c in Sources */ = {isa = PBXBuildFile; fileRef = 5C627EF11C018BDF004A12DA /* jsmn.c */; };
-		5C627EF41C018BDF004A12DA /* jsmn.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C627EF21C018BDF004A12DA /* jsmn.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5C627EF61C019A72004A12DA /* jsmn_swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C627EF51C019A72004A12DA /* jsmn_swift.swift */; };
 		5C86463B1C09A5A3005BB5AF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C86463A1C09A5A3005BB5AF /* main.swift */; };
 		5C86464E1C09A76F005BB5AF /* QuickJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CCDB8251C06C80200B24259 /* QuickJSON.swift */; };
 		5CC74C161C017E010029B819 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CC74C151C017E010029B819 /* PerformanceTests.swift */; };
@@ -50,10 +47,6 @@
 		0A43D5DA1BA609CA00D2B742 /* StronglyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StronglyJSON.swift; sourceTree = "<group>"; };
 		0A473E631BA6126200383AF3 /* RetrievalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RetrievalTests.swift; path = ../StronglyJSONTests/RetrievalTests.swift; sourceTree = "<group>"; };
 		0A4BC2F71BB8487E00F38CB0 /* ComprehensiveJSONReadTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ComprehensiveJSONReadTests.swift; path = StronglyJSONTests/ComprehensiveJSONReadTests.swift; sourceTree = SOURCE_ROOT; };
-		0AFE8C201BAA2A18008633A4 /* StronglyJSONParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StronglyJSONParser.swift; sourceTree = "<group>"; };
-		5C627EF11C018BDF004A12DA /* jsmn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jsmn.c; path = ../jsmn/jsmn.c; sourceTree = "<group>"; };
-		5C627EF21C018BDF004A12DA /* jsmn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsmn.h; path = ../jsmn/jsmn.h; sourceTree = "<group>"; };
-		5C627EF51C019A72004A12DA /* jsmn_swift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = jsmn_swift.swift; sourceTree = "<group>"; };
 		5C8646381C09A5A3005BB5AF /* parse */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = parse; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C86463A1C09A5A3005BB5AF /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		5CC74C151C017E010029B819 /* PerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PerformanceTests.swift; path = StronglyJSONTests/PerformanceTests.swift; sourceTree = SOURCE_ROOT; };
@@ -90,11 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				5CCDB8251C06C80200B24259 /* QuickJSON.swift */,
-				5C627EF51C019A72004A12DA /* jsmn_swift.swift */,
-				0AFE8C201BAA2A18008633A4 /* StronglyJSONParser.swift */,
 				0A43D5DA1BA609CA00D2B742 /* StronglyJSON.swift */,
-				5C627EF11C018BDF004A12DA /* jsmn.c */,
-				5C627EF21C018BDF004A12DA /* jsmn.h */,
 				0A43D5B71BA609AB00D2B742 /* StronglyJSON */,
 				0A43D5C31BA609AB00D2B742 /* StronglyJSONTests */,
 				5C8646391C09A5A3005BB5AF /* parse */,
@@ -150,7 +139,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5C627EF41C018BDF004A12DA /* jsmn.h in Headers */,
 				0A43D5B91BA609AB00D2B742 /* StronglyJSON.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -273,9 +261,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5C627EF31C018BDF004A12DA /* jsmn.c in Sources */,
 				5CCDB8261C06C80200B24259 /* QuickJSON.swift in Sources */,
-				5C627EF61C019A72004A12DA /* jsmn_swift.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -514,6 +500,7 @@
 				5C86463D1C09A5A3005BB5AF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
