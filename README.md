@@ -3,25 +3,18 @@
 A pure Swift 2.0 (no Foundation), strongly typed JSON parser.
 
 ```
-let json: JSON = "[1, 0.5, null]"
-json == JSON.JSONArray([.JSONInt(1), .JSONDouble(0.5), .JSONNull])
-json == [1, 0.5, nil]
+let arrayStr = "[1, 0.5, null]".unicodeScalars
+let json: JSON = JSONContainer.fromString(arrayStr, arrayStr.startIndex)
+json == [1, 0.5, nil] // this may not work right now with the new QuickJSON implementation, but it is planned
 
-let jsonFromInt: JSON = 4
-jsonFromInt == JSON.JSONInt(4)
 
-let jsonFromDict: JSON = ["someNullValue" : nil, "array" : [true, false], "nested" : ["key" : "value"]]
-jsonFromDict["array"]?[0] == true
-jsonFromDict["nested"]?["key"] == "value"
-print(jsonFromDict["someNullValue"]) // prints "null"
+// More examples to come, this is just a branch to show the comparitive speeds of the new QuickJSON implementation compared to NSJSONSerialization
 ```
 
 
 ## Usage:
 
-- Just copy __StronglyJSON.swift__ into your project
-- Note: this is Swift 2.0 code. You will need Xcode 7 or above.
-- Fork / clone the repo to develop (pull requests welcome!)
+xxx: todo
 
 
 ## Features:
